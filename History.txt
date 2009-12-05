@@ -227,3 +227,10 @@
   * Added an option 'echi_use_utc' in application.yml to record all data times in UTC for binary files, true by default
 * Bug fix(es):  
 * Known issue(s):
+
+== 0.4.3 2009-12-05
+
+* Major enhancement(s):
+* Minor enhancement(s):
+* Bug fix(es):  
+* Known issue(s):
