@@ -26,7 +26,7 @@
 
 (LGPL)
 
-Copyright (c) 2008 Jason Goecke
+Copyright (c) 2009 Jason Goecke
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
