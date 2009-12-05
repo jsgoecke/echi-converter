@@ -166,12 +166,6 @@ Please report questions here:
 
 	* Google Groups – ECHI Converter
 
-h2. How to submit patches
-
-Read the 8 steps for fixing other people’s code and for section 8b: Submit patch to Google Groups, use the Google Group above.
-
-The trunk repository is svn://rubyforge.org/var/svn/echi-converter/trunk for anonymous access.
-
 h2. License
 
 This code is free to use under the terms of the LGPL license.
