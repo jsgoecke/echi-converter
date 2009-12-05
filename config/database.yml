@@ -1,0 +1,7 @@
+#Database connection configuration, uses Active Record from Ruby on Rails
+adapter: mysql
+database: echi
+username: root
+password:
+host: localhost
+#encoding: utf8

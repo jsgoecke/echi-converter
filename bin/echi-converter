@@ -1,0 +1,220 @@
+#!/usr/bin/env ruby
+require 'rubygems'
+require 'daemons'
+require 'fileutils'
+require 'yaml'
+include FileUtils
+
+Signal.trap("INT") do
+  puts "Shutting down process: " + $$.to_s
+  Process.exit
+end
+
+usage = "Usage: 
+  echi-converter create myproject - create the local project to run the ECHI converter from (on Windows, directory names must not have spaces)
+  echi-converter upgrade myproject - location of project to upgrade after a new gem version is installed"
+
+#If we are running on Windows lets load the libraries necessary to run a win32 service
+if RUBY_PLATFORM["-mswin32"]
+  require 'win32/service'
+  #Preparing for supporting the latest library for supporting a Windows Service
+  #require 'win32/daemon'
+  include Win32
+  usage = usage +
+    "
+     echi-converter install myproject - install the service (must specify complete path such as c:\path\to\my\project )
+     echi-converter start - start the service
+     echi-converter stop - stop the service
+     echi-converter pause - pause the service
+     echi-converter resume - resume the service
+     echi-converter status - check the status of a configured service
+     echi-converter delete - delete the service"
+else
+  usage = usage + 
+    "echi-converter run myproject - Run the ECHI converter interactively from the location given
+    echi-converter start myproject - Start the ECHI converter in daemon mode from the location given
+    echi-converter stop myproject - Stop the ECHI converter daemon
+    echi-converter restart myproject - Restart the ECHI converter 
+    echi-converter zap myproject - If there has been an unexpected close and the system still thinks the converter is running, clean up the pid files"
+end
+
+def set_operating_environ
+  #Build details on the gem installed and its location and version
+  gem_searcher = Gem::GemPathSearcher.new
+  @echi_converter_gem = gem_searcher.find('echi-converter')
+  @echi_gem_loc = Gem::dir + '/gems/' + @echi_converter_gem.name + '-' + @echi_converter_gem.version.version
+end
+
+#Method for creating the project itself
+def create_project dir_name
+  if dir_name == nil
+    puts 'You must specify a directory name, proper usage is:'
+    if RUBY_PLATFORM['-mswin']
+      puts 'echi-converter create c:\path\to\my\directory'
+    else
+      puts 'echi-converter create /path/to/my/directory'
+    end
+    puts 'Exiting...'
+    exit
+  end
+
+  #Assemble elements to create root directory
+  dest_dir_relative = dir_name || Dir.pwd
+  dest_dir = File.expand_path dest_dir_relative
+  base_dir = File.expand_path File.dirname(__FILE__)
+
+  begin
+    echi_install_conf = YAML::load(File.open("#{@echi_gem_loc}/config/install_files.yml"))
+    #Make root directory of project
+    FileUtils.mkdir dest_dir
+    #Create subdirectories
+    echi_install_conf["dirs_to_create"].each do |dir|
+      FileUtils.mkdir dir_name + '/' + dir["name"]
+      puts 'Created directory: ' + dir_name + '/' + dir["name"]
+    end
+    #Copy files
+    echi_install_conf["files_to_copy"].each do |file|
+      FileUtils.cp "#{@echi_gem_loc}/#{file["name"]}", "#{dest_dir}/#{file["name"]}"
+      puts 'Created file: ' + dir_name + '/' + file["name"]
+    end
+  rescue => err
+    puts err
+    puts 'Fatal...exiting... - ' + err
+    exit
+  end
+  puts ''
+  puts 'Successfully created project in directory ' + dest_dir
+end
+
+#Stub to allow the upgrade of the project
+def upgrade_project project_name
+  #Assemble elements to create root directory
+  dest_dir_relative = project_name || Dir.pwd
+  dest_dir = File.expand_path dest_dir_relative
+  base_dir = File.expand_path File.dirname(__FILE__)
+  
+  begin 
+    echi_install_conf = YAML::load(File.open("#{@echi_gem_loc}/config/install_files.yml"))
+    #Copy files
+    echi_install_conf["files_to_upgrade"].each do |file|
+      FileUtils.cp "#{@echi_gem_loc}/#{file["name"]}", "#{dest_dir}/#{file["name"]}"
+      puts 'Upgraded file: ' + project_name + '/' + file["name"]
+    end
+  rescue => err
+    puts err
+    exit
+  end
+  puts ''
+  puts 'Successfully upgraded ' + project_name
+end
+
+#Launches as a Windows Service
+def launch_service run_type, project_name
+  if project_name != nil
+    rubyw_path = Config::CONFIG["bindir"] + "/" + Config::CONFIG["RUBYW_INSTALL_NAME"] + Config::CONFIG["EXEEXT"]
+    rubyw_path = rubyw_path.gsub("/","\\")
+    service_exe = '"' + rubyw_path + '" "' + project_name + "\\lib\\main_win32.rb" + '"'
+  end
+  begin
+    case run_type
+    when "install"
+      Service.create('ECHI-Converter', nil,
+        :service_type     => Service::WIN32_OWN_PROCESS,
+        :binary_path_name => service_exe.gsub(" ","\s"),
+        :start_type       => Service::AUTO_START,
+        :error_control    => Service::ERROR_NORMAL,
+        :display_name     => 'ECHI-Converter',
+        :description      => 'ECHI-Converter Service for ' + project_name
+      )
+      service_status = "Service successfully created."
+    when "start"
+      service_status = Service.start("ECHI-Converter")
+      service_status = "Service successfully started"
+    when "stop"
+      service_status = Service.stop("ECHI-Converter")
+      service_status = "Service successfully stopped"
+    when "pause"
+      service_status = Service.pause("ECHI-Converter")
+      service_status = "Service successfully paused"
+    when "resume"
+      service_status = Service.resume("ECHI-Converter")
+      service_status = "Service successfully resumed"
+    when "delete"
+      Service.delete("ECHI-Converter")
+      service_status = "Service successfully deleted"
+    when "status"
+      service_status = Service.status("ECHI-Converter").current_state
+    end
+    return service_status
+  rescue => err
+    return err
+  end
+end
+
+#Launches dynamically or as a deamon for *NIX platforms
+def launch_project run_type, project_name
+  
+  #Set various file paths
+  pid_directory = project_name + '/log'
+  script_path = project_name + '/lib/main.rb'
+  
+  #Build options to run as a daemon
+  options = {
+    :app_name => 'echi-converter',
+    :ARGV => [run_type],
+    :ontop => false,
+    :multiple => false,
+    :backtrace => true,
+    :monitor => true,
+    :dir_mode => :normal,
+    :dir => pid_directory,
+    :script => ''
+  }
+  
+  #If set, run interactively and not as a daemon
+  if run_type == 'run'
+    options["ontop"] = true
+  end
+  
+  #Daemonize
+  Daemons.run(script_path, options)
+end
+
+#We need to locate the echi-converter gem and set some variables
+set_operating_environ
+#Display initial banner of information
+puts '[' + @echi_converter_gem.name + ' ' + @echi_converter_gem.version.version + ']'
+puts @echi_converter_gem.summary
+puts ''
+puts @echi_converter_gem.homepage
+puts ''
+
+#Evaluate the selection and execute
+if ARGV[0] == 'create'
+  if ARGV[1] != nil
+    create_project ARGV[1]
+  else
+    puts "ECHI-converter - You must enter a project name when creating a project"
+  end
+elsif ARGV[0] == 'upgrade'
+  upgrade_project ARGV[1]
+elsif RUBY_PLATFORM["-mswin32"]
+  if ARGV[0] == 'install' || ARGV[0] == 'start' ||  ARGV[0] == 'stop' || ARGV[0] == 'pause' || ARGV[0] == 'resume' || ARGV[0] == 'uninstall' || ARGV[0] == 'delete' || ARGV[0] == 'status'
+    service_status = launch_service ARGV[0], ARGV[1]
+    puts 'ECHI-Converter: ' + service_status
+  else
+    puts usage
+  end
+elsif ARGV[0] == 'run' || ARGV[0] == 'start' || ARGV[0] == 'stop' || ARGV[0] == 'zap' || ARGV[0] == 'restart'
+  if ARGV[1] == nil
+    puts "ECHI-converter - You must enter a project name when starting or managing a project"
+  else
+    begin
+      launch_project ARGV[0], ARGV[1]
+    rescue => err
+      puts 'Failed to launch project: ' + err
+    end
+  end
+else
+  puts usage
+end

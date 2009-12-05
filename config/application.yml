@@ -1,0 +1,65 @@
+#Configuration details for the application
+
+#Connection details for the Avaya CMS/ECHI host
+echi_host:      localhost
+echi_port:      21
+echi_username:  anonymous
+echi_password:  
+echi_connect_type:  ftp #only ftp supported now, possible for ssh/sftp in the future
+echi_ftp_directory:  /Users/ftp/anonymous #If blank/nil, the system will not do a CD at the start
+echi_ftp_retry: 10
+echi_ftp_delete:  Y #to not delete the files off of the FTP server set to N, Y to delete the files
+echi_schema: extended_version13.yml
+echi_format: BINARY #valid settings are ASCII or BINARY
+echi_process_log: Y #valid is Y/N to turn it on or off
+echi_read_extra_byte: Y #May toggle this to Y, 'yes', or N, 'no', as to whether to read an extra byte for binary files at the end of each record
+echi_process_dat_files: N #Insert additional tables with data from the '.dat' files, and update regularly (not available when 'pco_process' set to 'Y')
+echi_use_utc: true
+#Filenames of the dat files
+echi_acd_dat: acd.dat
+echi_agent_dat: agname.dat
+echi_aux_rsn_dat: aux_rsn.dat
+echi_cwc_dat: cwc.dat
+echi_split_dat: split.dat
+echi_trunk_group_dat: tkgrp.dat
+echi_vector_dat: vector.dat
+echi_vdn_dat: vdn.dat
+
+#Special character handling section
+strip_characters: false
+#Decimal value of characters to strip
+#Refer to http://en.wikipedia.org/wiki/Ascii
+characters_to_strip: 0
+    
+#Currently only ftp supported, but may want to add SSH/SFTP later
+echi_xfer_type: ftp
+
+#How frequently to fetch records off of the Avaya CMS ftp server
+fetch_interval: 60  #in seconds
+max_ftp_sessions: 2 #Number of simultaneous ftp connections to use
+
+#Currently only database support, possible CSV in the future
+export_type:    database
+
+#Options are:
+    #FATAL:	an unhandleable error that results in a program crash
+    #ERROR:	a handleable error condition
+    #WARN:	a warning
+    #INFO:	generic (useful) information about system operation
+    #DEBUG:	low-level information for developers
+    #NONE:  turn off logging
+log_level:  NONE
+#How many log files to create and the length before cycling through
+log_number: 10
+#The size of each individual log file
+log_length: 10240000
+
+#Email address to send alerts to, specifically failures to connect to the DB or FTP servers
+#currently does not support an SMTP server that requires authentication
+send_email: true #Whether or not to send an email, true or false
+alert_email_address: youremail@yourdomain.com
+smtp_server: smtp.yourdomain.com
+smtp_port: 25
+
+#Special settings for a specific application database
+pco_process: N #Set to Y (yes) to enable using the PCO database or to no N (no) if not using the PCO database

@@ -1,0 +1,229 @@
+== 0.0.1 2007-07-22
+
+* 1 major enhancement(s):
+  * Initial release
+  * Alpha phase
+
+== 0.0.2 2007-08-01
+
+* Minor enhancement(s):
+  * Added config/extended_version13.yml for ECHI version 13 support
+  * Added examples/schemas/oracle_echi.sql example schema
+  * Changed BOOLEAN fields to char(1) with Y/N possible values (FR#12741)
+  * Added the ability to toggle deleting or leaving the FTP files (FR#12702)
+  * Removed some extraneous debug info
+* 1 Bug fix(es):
+  * Bug #12528 - Handle segstart/segstop dates properly
+  * Bug #12746 - Properly parse Bytearray for Boolean fields
+
+== 0.0.3 2007-08-10
+
+* Major enhancement(s):
+  * Added support for import of ASCII CSV files (FR#12997)
+* Minor enhancement(s):
+  * Added support of processing 'chr' files only (FR#12996)
+  * Added a configuration element to turn logging of file processing to a table on/off
+  * Removed the net/ssh library include, as not using sftp for now
+  * Added dependencies for other gems in the Rakefile for auto-install from Rubyforge
+* Bug fix(es):
+  * Added proper error handling when ftp user does not have delete rights
+
+== 0.0.4 2007-08-16
+
+* Major enhancement(s):
+  * Removed the 'echi-conveterter-create' bin file and replaced with 'echi-converter' to have one uniform executable for installation and operation (FR#12784)
+* Minor enhancement(s):
+  * Added configuration file config/install_files.yml for the new install method
+  * Added support for a monitor process using the Daemons library
+  * Reworked the way you create, run, start and stop a project that has been created, see the README.txt for details as well as the website
+  * Added the ability to set specific table names when using a specific PCO application
+  * Added the ability to upgrade the files when a new gem is installed
+* Bug fix(es):
+  * Bug #13062 - Corrected log table population
+
+== 0.0.5 2007-08-17
+
+* Major enhancement(s):
+* Minor enhancement(s):
+  * Removed all underscores ('_') from field names in config/schemas for version 12 & 13
+* Bug fix(es):
+  * Bug #13165 - Corrected post processing file move
+
+== 0.1.0 2007-08-26
+
+* Major enhancement(s):
+* Minor enhancement(s):
+  * Added additional details on gem requirements
+* Bug fix(es):
+  * Bug #13166 - Corrected records field definition in ECHI_LOGS to integer
+
+== 0.1.1 2007-09-17
+
+* Major enhancement(s):
+* Minor enhancement(s):
+  * Removed some extraneous comments to the log
+  * Added 'standard' schema definitions for revision 12 & 13 to the config directory
+* Bug fix(es):
+  * Fixed bug #14020 issue with binary offset
+  * In binary handling properly insert a Y/N for the booleans
+
+== 0.2.0 2007-10-21
+
+* Major enhancement(s):
+  * FR#14853 - Added support for ActiveRecord transactions on a per file basis
+* Minor enhancement(s):
+  * FR#14855 - Store processed files in a year/month directory structure based on processed date (ie - 2007/10)
+  * If the 'echi_ftp_directory' option in application.yml is left blank/nil, the system will not attempt a change directory
+  * The system now builds the files to process array from the to_process directory instead of the ftp list, to allow for better recovery if a failure occurs
+* Bug fix(es):
+  * Fixed bug #14585 requiring Hoe for the install
+  * Will now properly toggle between the standard schema and the Presence schema (ie - override ActiveRecord defaults)
+
+== 0.2.1 2007-10-26
+
+* Major enhancement(s):
+* Minor enhancement(s):
+* Bug fix(es):
+  * Fixed the database schema to pull from the appropriate config file information for the PCO schema
+
+== 0.2.2 2007-10-26
+
+* Major enhancement(s):
+* Minor enhancement(s):
+* Bug fix(es):
+  * Fixed the utility to only process files with the prefix 'chr' in order to avoid picking up other files from the 'to_process' directory
+  * Fixed the database_presence.rb to explicitly define tables rather than derive from the application.yml
+
+== 0.3.0 2007-11-02
+
+* Major enhancement(s):
+  * Added the ability to auto-recognize when running on Windows and enable running as a Windows Service (FR#14856/14852)
+* Minor enhancement(s):
+  * Changed 'echi_ftp_delete:' default setting to 'Y'
+  * A fair amount of internal code refactoring
+* Bug fix(es):
+  * Fixed bug so that the log file properly reports when a file is processed
+
+== 0.3.1 2007-11-04
+
+* Major enhancement(s):
+* Minor enhancement(s):
+  * Removed the need for the default install requirement, Ruby may now be installed anywhere on the Windows system (FR#15302)
+  * Modified the return status when creating or manipulating a Windows service
+  * Add the 'echi-converter status' command to check the status of a Windows service
+* Bug fix(es):
+  * Fixed bug #15293, the service now exists cleanly
+
+== 0.3.2 2007-11-05
+
+* Major enhancement(s):
+* Minor enhancement(s):
+  * FR#15361 - Added the ability to create echi_agents and then insert data from agname.dat
+  * Added better error handling by giving a proper error when no project name is provided on a create command
+  * Added requirement for 'uuidtools' gem for creating unique filenames for the agname.dat files since the Avaya outputs them the same
+  * Capture and report the error when echi-converter create command fails
+  * Provided an example ASCII CSV file in examples/ascii_csv for testing
+* Bug fix(es):  
+  * Bug ##15367 - Added to documentation that when using a Windows FTP server you must specify 'UNIX directory listing format'
+
+== 0.3.3 2007-11-06
+
+* Major enhancement(s):
+* Minor enhancement(s):
+  * Added error traps for ECHI_LOGS
+* Bug fix(es):  
+  * Fixed a bug where the utility was not properly deleting the files from the ftp server
+  * Fixed a bug for the pco schema usage changing the echi_log column processed_at to processedat via the 005_change_log_processedat_name migration
+
+== 0.3.4 2007-11-26
+
+* Major enhancement(s):
+* Minor enhancement(s):
+  * Added a database test script to examples/db_connect_test.rb
+  * Set the default ftp port in application.yml to 21
+  * Properly report that the database has been initialized at the start of processing as opposed to a successful connection
+  * Encapsulate the ASCII/BINARY database transactions in Begin/Rescue clauses to report on additional database issues that might arise
+  * Changed the schema YML references to 'echi_records' from 'fields' in order to use that file to store additional database table definitions
+  * Changed the default databse name to 'echi' in database.yml
+  * Added 006_create_echi_aux_reasons.rb, 007_create_echi_cwcs.rb and 008_create_echi_vdns.rb migrations following the same format as 001_create_echi_records.rb
+  * Startup sequence now shows which settings were used
+  * Changed the application.yml setting of echi_update_agent_data to echi_process_dat_files
+  * Refactored logging mechanism
+  * Added support for additional '.dat' files including aux_rsn.dat, cwc.dat and vdn.dat
+  * Added utf8 encoding option to config/database.yml
+  * Refactored FTP management into a new class
+  * FTP now supports setting an alternative port by setting 'echi_port' in the application.yml file
+  * Added option in config/application.yml, 'max_ftp_sessions', to allow for multiple ftp sessions to be used to increase ftp interaction performance
+* Bug fix(es):  
+
+== 0.3.5 2007-12-03
+
+* Major enhancement(s):
+* Minor enhancement(s):
+* Bug fix(es):  
+  * Fixed a bug with the ASCII processing that left out the agent_released field in the table and data, causing a misalignment.
+
+== 0.3.6 2007-12-20
+
+* Major enhancement(s):
+* Minor enhancement(s):
+  * Added a Signal.trap on interrupt to echi-converter executable for a more graceful shutdown 
+* Bug fix(es):  
+  * The bit operators in the boolean fields are now processed properly for BINARY file types (found by user Chun Lim)
+
+== 0.3.7 2008-03-25
+
+* Major enhancement(s):
+* Minor enhancement(s):
+  * Added support for the dat files: acd.dat, split.cat, tkgrp.dat and vector.dat
+  * Added support for turning email notifications on and off - FR#18889
+  * Changed the default logging in application.yml to 'NONE' from 'DEBUG'
+  * Added standard_version14.yml and extended_version14.yml
+* Bug fix(es):  
+  * Will now archive 0 length files and not stop the Windows Service - Bug#18888
+
+== 0.3.8 2008-07-18
+
+* Major enhancement(s):
+* Minor enhancement(s):
+* Bug fix(es):  
+  * #18888 with zero byte files
+  * #19437 Oracle table names too long in v0.3.7
+    * Removed indexes from echi_reasons, echi_acds, echi_splits, echi_trunks and echi_vectors
+    * Changed the following fields due to Oracle constraints in using 'number' as a field name:
+      - echi_acds
+        - number -> acd_number
+      - echi_splits
+        - number -> split_number
+      - echi_vectors
+        - number -> vector_number
+  * #19490 with inverted fileversion and filenumber
+  * #19493 issue with the extra byte read on binary files
+* Known issue(s):
+  * #21295 - Migrations for Oracle and automated table generation not working
+
+== 0.4.0 2008-07-22
+
+* Major enhancement(s):
+  * #15294 Windows Service installs as an Auto-Start service
+  * Updated and tested with the latest releases of each of the available gems that ECHI-Converter relies upon
+* Minor enhancement(s):
+* Bug fix(es):  
+  * #21295 - Migrations for Oracle and automated table generation not working
+* Known issue(s):
+
+== 0.4.1 2009-01-10
+
+* Major enhancement(s):
+* Minor enhancement(s):
+  * #23293 Strip special characters from strings before inserting to the database
+* Bug fix(es):  
+* Known issue(s):
+
+== 0.4.2 2009-02-02
+
+* Major enhancement(s):
+* Minor enhancement(s):
+  * Added an option 'echi_use_utc' in application.yml to record all data times in UTC for binary files, true by default
+* Bug fix(es):  
+* Known issue(s):

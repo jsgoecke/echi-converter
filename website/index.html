@@ -1,0 +1,199 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <link rel="stylesheet" href="stylesheets/screen.css" type="text/css" media="screen" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>
+      ECHI Converter
+  </title>
+  <script src="javascripts/rounded_corners_lite.inc.js" type="text/javascript"></script>
+<style>
+
+</style>
+  <script type="text/javascript">
+    window.onload = function() {
+      settings = {
+          tl: { radius: 10 },
+          tr: { radius: 10 },
+          bl: { radius: 10 },
+          br: { radius: 10 },
+          antiAlias: true,
+          autoPad: true,
+          validTags: ["div"]
+      }
+      var versionBox = new curvyCorners(settings, document.getElementById("version"));
+      versionBox.applyCornersToAll();
+    }
+  </script>
+</head>
+<body>
+<div id="main">
+
+    <h1>ECHI Converter</h1>
+    <div id="version" class="clickable" onclick='document.location = "http://rubyforge.org/projects/echi-converter"; return false'>
+      <p>Get Version</p>
+      <a href="http://rubyforge.org/projects/echi-converter" class="numbers">0.4.2</a>
+    </div>
+    <h1>&#8216;echi-converter&#8217;</h1>
+<h2>The <span class="caps">ECHI</span> (External Call History Interface) Converter</h2>
+<p>Provides a Ruby based utility for fetching Avaya <span class="caps">CMS</span> / <span class="caps">ECHI</span> files in binary/<span class="caps">ASCII</span> form from an <span class="caps">FTP</span> server, converting them, if necessary, to <span class="caps">ASCII</span> and then inserting them into a database via ActiveRecord.  With this utility you only need the standard Avaya <span class="caps">CMS</span> Release 13 or better without any additional software or utilities from Avaya, as this utility will process either binary or <span class="caps">ASCII</span> output from the Avaya <span class="caps">CMS</span>.</p>
+<h2>Status</h2>
+<p>This release is now in production use within Call Centers using the Avaya <span class="caps">CMS</span>.  The utility successfully and reliably imports the data provided by the Avaya <span class="caps">CMS</span> <span class="caps">ECHI</span> into various databases, including Microsoft Sqlserver, Oracle and MySQL.  This provides the repository of call segments that may then be used to provide detailed Cradle to Grave reporting for the call center.</p>
+<h2>Features</h2>
+<p>The utility provides the following capabilities:<br />
+	<br />
+	# Support of ActiveRecord (means you may use Oracle, MySQL, MS-<span class="caps">SQL</span>, Postgres, DB2, <span class="caps">ODBC</span>, etc)<br />
+	# Generate your schema via ActiveRecord Migrations automatically<br />
+	# Fetch Binary or <span class="caps">ASCII</span> <span class="caps">CSV</span> files from the Avaya <span class="caps">CMS</span> platform via <span class="caps">FTP</span><br />
+	# Insert the records into the defined database table using database transactions, via ActiveRecord, on a per file basis to support recovery on failure<br />
+	# Change schema structure via <span class="caps">YML</span> configuration file to accommodate various releases of the <span class="caps">ECHI</span> format<br />
+	# Supports inserting data from the various &#8216;.dat&#8217; files provided by the Avaya <span class="caps">CMS</span> into associated tables<br />
+	# Runs as a daemon (via fork) on Posix (*NIX) and a service on Windows<br />
+	# Has a watchdog process on Posix or you may set a service watch on Windows<br />
+	# Allows for multiple <span class="caps">FTP</span> sessions to be used for greater performance (via <a href="http://en.wikipedia.org/wiki/Green_threads">green threads</a>)</p>
+<ol>
+	<li>Table names:
+	<ol>
+		<li>echi_records &#8211; stores all <span class="caps">ECHI</span> data</li>
+		<li>echi_logs &#8211; stores a log entry for each file processed</li>
+		<li>echi_acds &#8211; stores the data from the acd.dat file</li>
+		<li>echi_agents &#8211; stores the data from the agname.dat file</li>
+		<li>echi_aux_reasons &#8211; stores the data from the aux_rsn.dat file</li>
+		<li>echi_cwcs &#8211; stores data from the cwc.dat file</li>
+		<li>echi_splits &#8211; stores data from the split.dat file</li>
+		<li>echi_trunk_groups &#8211; stores data from the tkgrp.dat file</li>
+		<li>echi_vdns &#8211; stores data from the vdn.dat file</li>
+		<li>echi_vectors &#8211; stores data from the vector.dat file</li>
+	</ol></li>
+</ol>
+<h2>What <span class="caps">ECHI</span>-Converter is not</h2>
+<p># A reporting engine<br />
+	# A set of database maintenance scripts<br />
+	<br />
+h2. Requirements</p>
+<p># <a href="http://www.ruby-lang.org/">Ruby v1.8.6+</a><br />
+	# <a href="http://www.rubygems.org/">Rubygems v1.2+</a> <br />
+	# <a href="http://activerecord.rubyforge.org/">ActiveRecord v2.1+</a><br />
+	# <a href="http://activesupport.rubyforge.org/">ActiveSupport v2.1+</a><br />
+	# <a href="http://daemons.rubyforge.org/">Daemons v1.0.10+</a><br />
+	# <a href="http://fastercsv.rubyforge.org/">FasterCSV v1.2.3+</a><br />
+	# <a href="http://rake.rubyforge.org/">Rake v0.8.1+</a><br />
+	# <a href="http://sporkmonger.com/projects/uuidtools/">UUIDTools v1.0.3+</a><br />
+	# <a href="http://win32utils.rubyforge.org/">Win32-service v.0.6.1+</a> (Manual install for Windows only)<br />
+	# <a href="http://rubyforge.org/projects/seattlerb/">Hoe v1.7+</a><br />
+	# Avaya <span class="caps">CMS</span> <span class="caps">ECHI</span> Release 12+ enabled and configured to send to an <span class="caps">FTP</span> server</p>
+<h2>Installing</h2>
+<pre syntax="ruby">sudo gem install echi-converter</pre>
+<p>or</p>
+<pre syntax="ruby">gem install echi-converter</pre>
+<h2>Setup</h2>
+<p>First, create the directory with all of the project files where you will run this application from:</p>
+<pre syntax="ruby">echi-converter create myproject</pre>
+<p>Once you have installed a project into your preferred directory, you then need to configure for your environment.  The first step is to modify each of these files:</p>
+<p># config/application.yml<br />
+	## Change each of the &#8216;echi&#8217; settings for connecting to your local <span class="caps">FTP</span> server where the <span class="caps">CMS</span> puts the <span class="caps">ASCII</span>/binary files<br />
+	## Select which schema you would like to use (ie &#8211; extended_version12.yml) based on what you have in place<br />
+	# config/database.yml<br />
+	## Change to match your local database and database login credentials, full ActiveRecord support<br />
+	## Note: Your database user and database must exist before running rake, as rake will then create the schema</p>
+<p>Once this is complete, then simply run these commands from the project directory:</p>
+<p># rake migrate (creates the tables required for the system)<br />
+	# echi-converter (starts the server daemon, refer to its usage)</p>
+<p>Note:  When using a Windows <span class="caps">FTP</span> server, you must configure the <span class="caps">FTP</span> server to provide a <span class="caps">UNIX</span> directory listing format.</p>
+<h2>Usage</h2>
+<ol>
+	<li>echi-converter create myproject &#8211; create the local project to run the <span class="caps">ECHI</span> converter from</li>
+	<li>echi-converter upgrade myproject &#8211; location of project to upgrade after a new gem is installed</li>
+</ol>
+<p>For <span class="caps">POSIX</span> (*NIX):</p>
+<ol>
+	<li>echi-converter run myproject &#8211; Run the <span class="caps">ECHI</span> converter interactively from the location given</li>
+	<li>echi-converter start myproject &#8211; Start the <span class="caps">ECHI</span> converter in daemon mode from the location given</li>
+	<li>echi-converter stop myproject &#8211; Stop the <span class="caps">ECHI</span> converter daemon</li>
+	<li>echi-converter restart myproject &#8211; Restart the <span class="caps">ECHI</span> converter</li>
+	<li>echi-converter zap myproject &#8211; If there has been an unexpected close and the system still thinks the converter is running, clean up the pid files</li>
+</ol>
+<p>For MS-Windows:</p>
+<ol>
+	<li>echi-converter install myproject &#8211; install the service (must specify complete path such as c:\path\to\my\project &#8211; if the directory name or path has any spaces, please enclose the &#8220;myproject&#8221; in double quotes )</li>
+	<li>echi-converter start &#8211; start the service</li>
+	<li>echi-converter stop &#8211; stop the service</li>
+	<li>echi-converter pause &#8211; pause the service</li>
+	<li>echi-converter resume &#8211; resume the service</li>
+	<li>echi-converter status &#8211; returns the status of a configured service</li>
+	<li>echi-converter delete &#8211; delete the service&quot;</li>
+</ol>
+<ol>
+	<li>If you would like to run the script interactively, you may also execute this command:
+	<ol>
+		<li>ruby &#8220;c:\myproject\lib\main_win32.rb&#8221;</li>
+	</ol></li>
+</ol>
+<p>Multi-byte character support:</p>
+<ol>
+	<li>If you require multi-byte character support be sure to set your database to &#8216;utf8&#8217; as well as uncomment the option &#8216;encoding: utf8&#8217; in the config/database.yml file</li>
+</ol>
+<h2>Demonstration of usage</h2>
+<p>Start the daemon/service:</p>
+<pre syntax="ruby">echi-converter start myproject</pre>
+<p>Stop the daemon/service:</p>
+<pre syntax="ruby">echi-converter stop myproject</pre>
+<h2>Supported Platforms</h2>
+<p>While the use of Ruby allows for operation on a multitude of platforms, these are the platforms that have actually been tested on.  If you have success running on other platforms, please feel free to provide details on the Google Group.</p>
+<h4>Operating Systems</h4>
+<ol>
+	<li><span class="caps">POSIX</span></li>
+	<li>Windows XP SP2</li>
+	<li>Windows 2000</li>
+	<li>Windows 2003</li>
+</ol>
+<h4>Databases</h4>
+<ol>
+	<li>MySQL</li>
+	<li>Microsoft Sqlserver</li>
+	<li>DB2</li>
+	<li>Sqlite3</li>
+	<li>Postgres</li>
+	<li>Oracle</li>
+</ol>
+<h4><span class="caps">FTP</span> Servers</h4>
+<ol>
+	<li><span class="caps">VSFTP</span></li>
+	<li>Windows 2003/XP <span class="caps">FTP</span> Servers (When using a Windows <span class="caps">FTP</span> server, you must configure the <span class="caps">FTP</span> server to provide a <span class="caps">UNIX</span> directory listing format.)</li>
+</ol>
+<h2>Related Avaya Documentation for <span class="caps">ECHI</span></h2>
+<ol>
+	<li><a href="http://support.avaya.com/elmodocs2/cms/R14/ECHI.pdf">Avaya Call Management System Release 14 External Call History Interface</a></li>
+	<li><a href="http://support.avaya.com/elmodocs2/cms_r13_1/07-300737_ECHI.pdf">Avaya Call Management System Release 13 External Call History Interface</a></li>
+</ol>
+<h2>Screencast</h2>
+<p>You may view the screencast on howto install and use the <span class="caps">ECHI</span>-Converter <a href="http://www.screencast.com/t/lQQkIVkUZMr">here</a>.</p>
+<h2>Consulting Services</h2>
+<p>If you would like help installing, configuring or adding features please do not hesitate to contact the consulting services of Adhearsion <a href="http://new.adhearsion.com/consulting">here</a>.</p>
+<h2>Forum</h2>
+<p>Please report questions here:</p>
+<p><a href="http://groups.google.com/group/echi-converter">Google Groups &#8211; <span class="caps">ECHI</span> Converter</a></p>
+<p>Please report bugs here:</p>
+<p><a href="http://rubyforge.org/tracker/?atid=15802&amp;group_id=4110&amp;func=browse">Ruby Forge Bug Tracker &#8211; <span class="caps">ECHI</span> Converter</a></p>
+<h2>How to submit patches</h2>
+<p>Read the <a href="http://drnicwilliams.com/2007/06/01/8-steps-for-fixing-other-peoples-code/">8 steps for fixing other people&#8217;s code</a> and for section <a href="http://drnicwilliams.com/2007/06/01/8-steps-for-fixing-other-peoples-code/#8b-google-groups">8b: Submit patch to Google Groups</a>, use the Google Group above.</p>
+<p>The trunk repository is <code>svn://rubyforge.org/var/svn/echi-converter/trunk</code> for anonymous access.</p>
+<h2>License</h2>
+<p>This code is free to use under the terms of the <span class="caps">LGPL</span> license.</p>
+<h2>Contact</h2>
+<p>Comments are welcome. Send an email to <a href="mailto:jason@goecke.net">jason [at] goecke.net</a>.</p>
+<h2>Brought to you by</h2>
+<ol>
+	<li><a href="http://www.adhearsion.com">Adhearsion</a>, the open-source, unconventional voice framework that ties technologies together neatly.</li>
+</ol>
+    <p class="coda">
+      <a href="mailto:drnicwilliams@gmail.com">Dr Nic</a>, 20th February 2009<br>
+      Theme extended from <a href="http://rb2js.rubyforge.org/">Paul Battley</a>
+    </p>
+</div>
+
+<!-- insert site tracking codes here, like Google Urchin -->
+
+</body>
+</html>
