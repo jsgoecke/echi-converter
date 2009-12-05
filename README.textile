@@ -67,12 +67,12 @@ First, create the directory with all of the project files where you will run thi
 echi-converter create myproject
 Once you have installed a project into your preferred directory, you then need to configure for your environment. The first step is to modify each of these files:
 
-	* config/application.yml
-	** Change each of the ‘echi’ settings for connecting to your local FTP server where the CMS puts the ASCII/binary files
-	** Select which schema you would like to use (ie – extended_version12.yml) based on what you have in place
-	* config/database.yml
-	** Change to match your local database and database login credentials, full ActiveRecord support
-	#** Note: Your database user and database must exist before running rake, as rake will then create the schema
+	# config/application.yml
+	## Change each of the ‘echi’ settings for connecting to your local FTP server where the CMS puts the ASCII/binary files
+	## Select which schema you would like to use (ie – extended_version12.yml) based on what you have in place
+	# config/database.yml
+	## Change to match your local database and database login credentials, full ActiveRecord support
+	## Note: Your database user and database must exist before running rake, as rake will then create the schema
 
 Once this is complete, then simply run these commands from the project directory:
 
@@ -106,9 +106,9 @@ h3. For MS-Windows:
 	
 If you would like to run the script interactively, you may also execute this command:
 
-ruby “c:\myproject\lib\main_win32.rb”
+	* ruby “c:\myproject\lib\main_win32.rb”
 
-Multi-byte character support:
+h3. Multi-byte character support
 
 If you require multi-byte character support be sure to set your database to ‘utf8’ as well as uncomment the option ‘encoding: utf8’ in the config/database.yml file
 
